@@ -1,0 +1,55 @@
+- Senha BRQ = Brq@12344848
+
+- comando para criar e manipular SLS
+serverless create --template aws-nodejs --path cadastro-pacientes
+
+- comando para invocar localmente o module.exports = hello
+serverless invoke local -f hello
+
+- comando para invocar a função e passar parametros
+serverless invoke local -f listarPacientes -d '{"teste": "teste"}'
+
+- comando para fazer o deploy na AWS pelo Serverless
+serverless deploy
+
+- comando para fazer o deploy na AWS pelo Serverless no ambiente da stack de qa
+serverless deploy --stage qa
+
+- comando para ver logs 
+serverless logs -f obterPacienteId --tail
+
+- comando para fazer o deploy apenas da função alterada 
+serverless deploy -f ObterPacienteId
+
+- comando para tarzer as informações da api das nossas aplicações
+serverless info
+
+- comando para instalar localmente o teste da aplicação
+npm install serverless-offline --save-dev
+
+- comando para rodar a aplicação localmente
+serverless offiline
+
+- comando para validar se o plugin foi instalado com sucesso
+serverless --verbose
+
+- comando para instalar o sdk aws
+npm i aws-sdk
+
+- comando do aws-cli para popular o dynamoDB localmente
+aws dynamodb batch-write-item --request-items
+
+- comando do aws-cli para criar uma tabela
+aws dynamodb create-table --table-name paciente_new --attribute-definitions AttributeName=paciente_id, AttributeType=S --key-schema AttributeName=paciente_id, KeyType=HASH --provisioned-throughput ReadCapacityUnits=5, WriteCapacityUnits=5 --tags Key=Owner,Value=blueTeam
+
+- comando para instalação do dynamoDB locamente
+1° passo: npm i serverless-dynamodb-local --save-dev
+2° passo: serverless dynamodb install - gera o .jar
+
+- comando para subir a aplicação localmente junto com o dynamoDB
+serverless offline start
+
+- comando para instalar o dynamodb local apartir do stage dev
+serverless dynamodb install --stage dev
+
+serverless deploy --stage qa/uat/dev/prod ambientes segregados
