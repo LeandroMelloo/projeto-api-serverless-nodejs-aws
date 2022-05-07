@@ -1,3 +1,196 @@
+Treinamento Erick Wendel - Serverless nodejs
+
+1° Passo - Criar uma conta na AWS
+
+##################################################################################################################################################################
+                                                            IAM
+##################################################################################################################################################################
+
+2° Passo - Criar um usuário no serviço IAM da AWS para fazer testes em uma conta para desenvolvimento e não na conta raiz
+    Etapas:
+        - Ir até Access management -> Users -> Add user -> colocar um nome de usuário -> marcar todas as checkbox -> colocar uma senha para não gerar novamente ->
+        next -> criar um grupo -> colocar o nome do grupo -> filtrar politicas -> AdministratorAccess(Job function) -> criar o grupo -> next -> next
+        - Fazer download do .csv com as credenciais
+
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+                                                            Console AWS
+##################################################################################################################################################################
+
+3° Passo - Acessar a plataforma da AWS com as credenciais geradas no passo 2
+
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+                                                            Instalação AWS CLI
+##################################################################################################################################################################
+
+4° Passo - Instalar o AWS CLI download windows
+    Etapas:
+        - Depois de fazer o download da CLI pelo site da AWS: https://docs.aws.amazon.com/pt_br/cli/latest/userguide/getting-started-install.html
+        - Fazer a instalação do .exe
+        - Depois de instalar fazer a verificação se a CLI foi instalada corretamente com o seguinte comando: aws --version
+        - Retorno: aws-cli/1.22.23 Python/3.6.0 Windows/10 botocore/1.23.23
+
+5° Passo - Configurar as credenciais locais por linha de comando
+    Etapas:
+        - Digitar no terminal aws configure
+        - Colocar a Access Key ID, Secret Access Key ID, Region, Formato(Json)
+
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+                                                            S3
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+6° Passo - Criar um bucket no serviço da AWS S3
+    Etapas:
+        - Amazon S3 -> Create bucket -> Bucket name -> atribuir um nome: mello-007-storage
+
+7° Passo - Visualizar o bucket por linha de comando
+- comando: aws s3 ls mello-007-storage (nome do bucket no s3), em caso de erro: aws s3 ls mello-007-storage --profile=default
+
+8° Passo - Criando um arquivo local para upload para AWS
+- comando: echo "Hello World" > file-test.txt
+
+9° Passo - Fazer upload do arquivo criado no passo 8
+- comando: aws s3 cp file-test s3://mello-007-storage, em caso de erro: aws s3 cp file-test.txt s3://mello-007-storage --profile=default
+
+10° Passo - Acessar o arquivo que foi enviado no passo 9
+- comando: aws s3 ls mello-007-storage, em caso de erro: aws s3 ls mello-007-storage --profile=default
+##################################################################################################################################################################
+
+##################################################################################################################################################################     
+                                                                Lambda
+##################################################################################################################################################################
+
+##################################################################################################################################################################     
+11° Passo - Criando uma função lambda através da AWS
+    Etapas:
+        - Acesse o serviço lambda na AWS: https://us-east-1.console.aws.amazon.com/lambda/home?region=us-east-1#/functions
+        - Lambda -> Functions -> Create function -> colocar Function Name
+        - No Lambda precisamos adcionar uma trigger
+        - Lambda -> Add trigger -> Trigger configuration -> API Gateway -> Rest API -> Open(para qualquer pessoa poder acessar a api) -> criar
+
+12° Passo - Pegar a URL e colar no browser
+- https://2oytr518ja.execute-api.us-east-1.amazonaws.com/default/hello-interface?num1=10&num2=10
+
+13° Passo - Alterar o código padrão que vem na criação da função Lambda
+
+- código alterado:
+
+exports.handler = async (event) => {
+    // TODO implement
+    const { num1, num2 } = event.queryStringParameters
+    const response = {
+        statusCode: 200,
+        body: `A soma é ${parseInt(num1) + parseInt(num2)}`,
+    };
+    return response;
+};
+
+obs: Depois do código alterado é preciso salvar e realizar o deploy para pegar as alterações
+
+14° Criando uma função Lambda através do terminal, sem framework
+    Etapas:
+        - mkdir demo01-lambda-sem-framework
+        - cd demo01-lambda-sem-framework
+        - nul > run.sh (cria arquivo no windows por linha de comando)
+        - criar um arquivo para colocar as politicas de segurança da API Lambda
+        - nul > politicas.json
+        - inserir as seguintes informações no arquivo politicas.json:
+            - {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            }
+
+        - criar uma pasta logs para gravar as informações da role
+        - rodar o seguinte comando no terminal que se encontra no arquivo run.sh:
+            - aws iam create-role \
+                --role-name lambda-exemplo \
+                --assume-role-policy-document file://politicas.json \
+                | tee logs/role.log
+        
+        - criar um arquivo index.js
+        - criar uma função handler para poder zipar
+        - rodar o seguinte comando:
+            - zip function.zip index.js
+        - será gerado uma pasta zipada com o nome: function.zip
+        - depois rodar o seguinte comando no terminal:
+            - aws lambda create-function \
+                --function-name hello-cli \
+                --zip-file fileb://function.zip \
+                --handler index.handler \
+                --runtime nodejs12.x \
+                --role arn:aws:iam::452137519136:role/lambda-exemplo \
+                | tee logs/lambda-create.log
+        - invocar a lambda via terminal de comando
+        - rodar o seguinte comando:
+            aws lambda invoke \
+                --function-name hello-cli \
+                --log-type Tail \
+                logs/lambda-exec.log
+        - toda vez que eu alterar o arquivo index.js devo zipar este arquivo novamente
+        - zip function.zip index.js
+        - e rodar o seguinte comando de atualização para publicar novamente a lambda na AWS:
+            - aws lambda update-function-code \
+                --zip-file fileb://function.zip \
+                --function-name hello-cli \
+                --publish \
+                | tee logs/lambda-update.log
+        - invocar a lambda via terminal de comando novamente atualizada
+        - rodar o seguinte comando:
+            aws lambda invoke \
+                --function-name hello-cli \
+                --log-type Tail \
+                logs/lambda-exec-update.log
+        - remover a função lambda
+        - rodar o seguinte comando para remover a função lambda:
+            - aws lambda delete-function \
+                --function-name hello-cli
+
+            - aws iam delete-role \
+                --role-name lambda-exemplo
+##################################################################################################################################################################     
+
+##################################################################################################################################################################
+                                                            Lambda com Serverles Framework
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+15° Passo - Criar o run.sh dentro da pasta demo02-sls-framework
+16° Passo - Criar o arquivo run.sh
+    - comando: nul > run.sh - Linux = cat > run.sh
+##################################################################################################################################################################
+
+##################################################################################################################################################################
+                                                                Informações importantes
+##################################################################################################################################################################
+
+AWS - Trabalha orientada a eventos -> Eventos(rotina de log, cronjob, rotina de email)
+
+Diagrama: Serverless/Faas Architecture
+
+Cliente -> Faz uma requisição(Web service Call) -> para Amazon API Gateway -> gerou um evento -> quero guardar no db (Amazon Dynamo DB)
+
+AWS - Plataforma gerencia seu código, e você paga pelo que utiliza
+
+Cloud Providers
+- Azure Functions, AWS Lambda, IBM OpenWhisk, Google Cloud Functions, Auth0 Webtask
+
+- comando para instalar o serverless framework
+npm install -g serverless
+
 - comando para criar e manipular SLS
 serverless create --template aws-nodejs --path cadastro-pacientes
 
@@ -51,3 +244,21 @@ serverless offline start
 serverless dynamodb install --stage dev
 
 serverless deploy --stage qa/uat/dev/prod ambientes segregados
+
+cold start pode demorar um pouco para subir o projeto
+tempo da aplicação se a lambda demorar muito nas requisições, já não é viavel.
+    - exemplo: 
+        - gerar relatorio
+        - fazer um web scraping
+
+serverless framework foi criado para trabalhar com multi-nuvem
+
+##################################################################################################################################################################
+instando aws pelo linux
+##################################################################################################################################################################
+sudo apt-get update
+sudo apt-get install awscli
+
+aws --version
+
+##################################################################################################################################################################     
