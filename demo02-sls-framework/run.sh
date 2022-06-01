@@ -21,5 +21,8 @@
 # 7° Passo - Invocar a função Lambda Localmente na máquina
 - comando: sls invoke local -f hello --log
 
-# 8° Passo - Aguardando eventos
+# 8° Passo - Aguardando eventos de log
 - comando: sls logs -f hello --tail
+
+# 9° Passo - Remover
+- comando: sls remove

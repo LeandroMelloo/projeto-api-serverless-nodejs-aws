@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports.hello = async (event) => {
+module.exports.hello = async event => {
   console.log('Evento: ', JSON.stringify(event, null, 2))
   return {
     statusCode: 200,
