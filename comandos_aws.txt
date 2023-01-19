@@ -3,7 +3,7 @@ Treinamento Erick Wendel - Serverless nodejs
 1° Passo - Criar uma conta na AWS
 
 ##################################################################################################################################################################
-                                                            IAM
+                                                            IAM = Serviço para gerenciar acesso na AWS 
 ##################################################################################################################################################################
 
 2° Passo - Criar um usuário no serviço IAM da AWS para fazer testes em uma conta para desenvolvimento e não na conta raiz
@@ -37,11 +37,13 @@ Treinamento Erick Wendel - Serverless nodejs
     Etapas:
         - Digitar no terminal aws configure
         - Colocar a Access Key ID, Secret Access Key ID, Region, Formato(Json)
+        - Region = us-east-1
+        - Format = json
 
 ##################################################################################################################################################################
 
 ##################################################################################################################################################################
-                                                            S3
+                                                            S3 = Serviço de storage da AWS
 ##################################################################################################################################################################
 
 ##################################################################################################################################################################
@@ -56,7 +58,7 @@ Treinamento Erick Wendel - Serverless nodejs
 - comando: echo "Hello World" > file-test.txt
 
 9° Passo - Fazer upload do arquivo criado no passo 8
-- comando: aws s3 cp file-test s3://mello-007-storage, em caso de erro: aws s3 cp file-test.txt s3://mello-007-storage --profile=default
+- comando: aws s3 cp file-test.txt s3://mello-007-storage, em caso de erro: aws s3 cp file-test.txt s3://mello-007-storage --profile=default
 
 10° Passo - Acessar o arquivo que foi enviado no passo 9
 - comando: aws s3 ls mello-007-storage, em caso de erro: aws s3 ls mello-007-storage --profile=default
